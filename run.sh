@@ -1,7 +1,7 @@
 llm_base_url="https://api.openai.com/v1"
-llm_api_key="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"
+llm_api_key="EMPTY"
 model_name="gpt-4o-mini"
-serp_api_key="a95506a9d63c6ec03649c8b8fee4f32cbbddc2d538b598b356f7648a51f197bd"
+serp_api_key="EMPTY"
 seed_file="seed_example.txt"
 num=3
 output_path="output/output.txt"
