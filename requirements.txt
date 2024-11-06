@@ -2,3 +2,4 @@ requests
 beautifulsoup4
 openai
 google-search-results
+pandas

@@ -3,8 +3,10 @@ llm_api_key="EMPTY"
 model_name="gpt-4o-mini"
 serp_api_key="EMPTY"
 seed_file="seed_example.txt"
-num=3
-output_path="output/output.txt"
+number_created_questions=3
+number_retrieved_pages=3
+output_path="instruction.json"
+
 
 python main.py\
     --llm_base_url ${llm_base_url} \
@@ -12,6 +14,7 @@ python main.py\
     --model_name ${model_name} \
     --serp_api_key ${serp_api_key} \
     --seed_file ${seed_file} \
-    --num ${num} \
+    --number_created_questions ${number_created_questions}\
+    --number_retrieved_pages ${number_retrieved_pages} \
     --output_path ${output_path} \
     --verbose true

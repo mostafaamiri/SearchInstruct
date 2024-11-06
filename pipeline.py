@@ -1,4 +1,4 @@
-from utils import get_examples, get_context, get_response
+from utils import get_examples, make_context, get_response
 from typing import List ,Union
 from tools import LLM, Tools
 
@@ -20,7 +20,7 @@ class Pipeline():
         samples = get_examples(seed, self.llm, self.model, self.sample_prompt, verbose)
         print(samples)
         instructions = []
-        for q in samples['question']:
-            context =get_context(q, self.tool, self.num, verbose)
-            instructions.append(get_response(q, context, self.llm, self.model, self.respond_prompt, verbose))
+        for q in samples['questions']:
+            context, links =make_context(q, self.tool, self.num, verbose)
+            instructions.append(get_response(q, context, links, self.llm, self.model, self.respond_prompt, verbose))
         return instructions          

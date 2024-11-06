@@ -34,4 +34,4 @@ class SerpTool(Tools):
                 bs = BeautifulSoup(resp.text, 'html.parser')
                 context += bs.find('body').getText()
                 context += "\n"
-        return context
+        return context, links

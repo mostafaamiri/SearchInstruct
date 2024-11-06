@@ -22,6 +22,7 @@ def get_examples(seed: Union[str, List[str]], agent: LLM, model: str, prompt: st
                 "content": questions,
             }
         ],
+        temperature=0.5,
         model=model,
     )
     print(re.findall(r"{[\s.\S]+}",completion.choices[0].message.content,re.MULTILINE)[0])
