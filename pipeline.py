@@ -23,7 +23,7 @@ class Pipeline():
         for q in samples['question']:
             try:
                 context =get_context(q, self.tool, self.num, verbose)
-                instructions.append(get_response(q, context, self.llm, self.model, self.respond_prompt, verbose))
+                instructions.append(get_response(q, context[:min(200000,len(context))], self.llm, self.model, self.respond_prompt, verbose))
             except Exception as err:
                 print(print(f"Unexpected {err=}, {type(err)=}"))
         return instructions          
