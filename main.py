@@ -1,4 +1,4 @@
-from tools import SerpTool, LLM, GoogleSearchTool
+from tools import SerpTool, LLM, GoogleSearchTool, SerperTool
 from argparse import ArgumentParser
 from pipeline import Pipeline
 import pandas as pd
@@ -26,6 +26,8 @@ number_retrieved_pages = int(args.number_retrieved_pages)
 number_created_questions = int(args.number_created_questions)
 if args.tool_name == 'serp_tool':
     tool = SerpTool('serp', args.serp_api_key)
+if args.tool_name == 'serper_tool':
+    tool = SerperTool('serper', args.serp_api_key)
 else:
     tool = GoogleSearchTool('google_search', llm, model)
 
