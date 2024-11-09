@@ -15,4 +15,4 @@ def get_response(query: str, context:str, links: Union[List[str], str], agent: L
     result = completion.choices[0].message.content
     if verbose:
         print(result)
-    return {"instruction": query[4:], "output": result, "links": links}
+    return {"context": context, "instruction": query, "output": result, "links": links}

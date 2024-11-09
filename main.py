@@ -14,6 +14,7 @@ parser.add_argument("--seed_file")
 parser.add_argument("--number_created_questions")
 parser.add_argument("--number_retrieved_pages")
 parser.add_argument("--verbose")
+parser.add_argument("--seed_as_instructs")
 parser.add_argument("--output_path")
 
 args = parser.parse_args()
@@ -30,6 +31,7 @@ else:
 
 seed_file = args.seed_file
 verbose = args.verbose
+seed_as_instructs = args.seed_as_instructs
 output_path = args.output_path
 
 sample_prompt = f"""
@@ -41,7 +43,9 @@ Do not include any additional explanations or comments in your response.
 """
 
 respond_prompt = """
-Try to answer the user's question accurately and correctly and with sufficient explanations only according to this content that you see below:\n
+Provide accurate and well-explained answers to the user's questions, based on the content provided below. 
+Ensure your response is as complete and comprehensive as possible. 
+Do not include information or assumptions outside of this content.
 """
 
 if __name__ == '__main__':
@@ -50,7 +54,7 @@ if __name__ == '__main__':
     with open(seed_file, 'r') as f:
         for line in f.readlines():
             seeds.append(line.strip())
-    instructions = pipeline(seeds, verbose)
+    instructions = pipeline(seeds, verbose, seed_as_instructs)
 
     # Convert  to a DataFrame
     df = pd.DataFrame(instructions)

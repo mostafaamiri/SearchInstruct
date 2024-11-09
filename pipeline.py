@@ -15,9 +15,10 @@ class Pipeline():
     def __call__(
             self, 
             seed: Union[str, List[str]], 
-            verbose:bool=False):
+            verbose:bool=False,
+            seed_as_instructs:bool=False):
         
-        samples = get_examples(seed, self.llm, self.model, self.sample_prompt, verbose)
+        samples = get_examples(seed, self.llm, self.model, self.sample_prompt, verbose, seed_as_instructs)
         print(samples)
         instructions = []
         for q in samples['questions']:

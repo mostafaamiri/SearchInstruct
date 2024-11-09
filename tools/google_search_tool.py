@@ -28,23 +28,28 @@ class GoogleSearchTool(Tools):
                 break
             else:
                 sleep(10)
+
         context = ""
         used_links = []
+        num_context = 0
         for link in retrieval_links:
+            
+            if num_context >= 3:
+                break
+            
             try:
                 resp =requests.get(link, timeout=30)
             except:
                 print('\033[94m'+f"can't open{link}"+'\033[0m')
                 continue
-            num_context = 0
+
             if resp:
                 used_links.append(link)
                 bs = BeautifulSoup(resp.text, 'html.parser')
                 context += bs.find('body').getText()
                 context += "\n"
                 num_context+=1
-            if num_context > 3:
-                break
+        
         return context, used_links
     
     def prepare_query(self, q: str):

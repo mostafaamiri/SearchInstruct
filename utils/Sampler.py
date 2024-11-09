@@ -3,7 +3,7 @@ from typing import List, Union
 import re
 import json
 
-def get_examples(seed: Union[str, List[str]], agent: LLM, model: str, prompt: str, verbose: bool= False)-> dict:
+def get_examples(seed: Union[str, List[str]], agent: LLM, model: str, prompt: str, verbose: bool= False, seed_as_instructs: bool = False)-> dict:
     if(type(seed) == type([])):
         questions = ""
         for i in range(len(seed)):
@@ -11,6 +11,16 @@ def get_examples(seed: Union[str, List[str]], agent: LLM, model: str, prompt: st
     else:
         questions = seed
     print(questions)
+    
+    if seed_as_instructs:
+        result = {'questions': seed if isinstance(seed, list) else [seed]}
+        if verbose:
+            for k in result:
+                print(k)
+                for q in result[k]:
+                    print(q)
+        return result
+
     completion = agent.get_client().chat.completions.create(
         messages=[
             {
@@ -28,6 +38,7 @@ def get_examples(seed: Union[str, List[str]], agent: LLM, model: str, prompt: st
     print(re.findall(r"{[\s.\S]+}",completion.choices[0].message.content,re.MULTILINE)[0])
     try:
         result = json.loads(re.findall(r"{[\s.\S]+}",completion.choices[0].message.content,re.MULTILINE)[0])
+        print(result)
         if verbose:
             for k in result:
                 print(k)
