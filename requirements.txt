@@ -3,3 +3,5 @@ beautifulsoup4
 openai
 google-search-results
 pandas
+googlesearch-python==1.2.5
+selenium==4.26.1
