@@ -28,7 +28,7 @@ parser.add_argument(
     required=True,
     help="Number of pages to retrieve from the search tool."
 )
-parser.add_argument("--verbose", default=True, help="Enable verbose output.")
+parser.add_argument("--verbose", default=False, help="Enable verbose output.")
 parser.add_argument(
     "--seed_as_instructs",
     default=False,
@@ -39,6 +39,12 @@ parser.add_argument(
     "--sample_size",
     type=int,
     help="Number of seed questions to randomly select for LLM input."
+)
+parser.add_argument(
+    "--iterations",
+    type=int,
+    default=1,
+    help="Number of times to run the pipeline."
 )
 
 args = parser.parse_args()
@@ -67,8 +73,8 @@ Do not include any additional explanations or comments in your response.
 
 # Define the respond prompt for answering questions
 respond_prompt = """
-Provide accurate and well-explained answers to the user's questions, based on the content provided below. 
-Ensure your response is as complete and comprehensive as possible. 
+Provide accurate and well-explained answers to the user's questions, based on the content provided below.
+Ensure your response is as complete and comprehensive as possible.
 Do not include information or assumptions outside of this content.
 """
 
@@ -92,7 +98,8 @@ if __name__ == '__main__':
         seed_questions=seed_questions,
         verbose=args.verbose,
         seed_as_instructions=args.seed_as_instructs,
-        sample_size=args.sample_size  # Pass the sample_size argument
+        sample_size=args.sample_size,
+        iterations=args.iterations  # Pass the iterations argument
     )
 
     # Convert the instructions to a DataFrame
