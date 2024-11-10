@@ -163,12 +163,3 @@ cython_debug/
 /output
 /*env
 test*
-
-# JSON files
-*.json
-
-# CSV files
-*.csv
-
-# TXT files
-*.txt
