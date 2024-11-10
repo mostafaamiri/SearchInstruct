@@ -1,6 +1,7 @@
 from typing import List, Union
 from utils import get_examples, make_context, get_response
 from tools import LLM, Tools
+from tqdm import tqdm  
 
 class Pipeline:
     def __init__(
@@ -53,7 +54,8 @@ class Pipeline:
         """
         all_instructions = []
 
-        for iteration in range(iterations):
+        # Add progress bar for iterations
+        for iteration in tqdm(range(iterations), desc="Iterations", unit="iteration"):
             if verbose:
                 print(f"\nStarting iteration {iteration + 1} of {iterations}")
 
@@ -71,7 +73,9 @@ class Pipeline:
             if verbose:
                 print(f"Generated Samples: {samples}")
 
-            for question in samples['questions']:
+            questions = samples['questions']
+            # Add progress bar for questions within each iteration
+            for question in tqdm(questions, desc="Questions", unit="question", leave=False):
                 try:
                     # Generate context and retrieve links using the search tool
                     context, links = make_context(

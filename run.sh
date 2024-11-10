@@ -4,7 +4,7 @@
 llm_base_url="https://api.openai.com/v1"
 
 # Set the API key for the LLM
-llm_api_key="sk-proj-mR8fh4IOpTxJrdE8ZHmgm6RHeqSW2KZEw1sWBu7LSrEtQX4zVqc3VzHOU1-uB3qltq7zoI3iST3BlbkFJMlxP-9QLqvTaHNFvFhqD2jIL2UEe_3Krxr8vX_tdo8PtDHfdddumYEGG3HsdufQgmbToY55S4A"
+llm_api_key="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"
 
 # Set the model name to use
 model_name="gpt-4o-mini"
@@ -19,7 +19,7 @@ seed_file="iran_tourism_seeds.txt"
 number_created_questions=3
 
 # Set the number of pages to retrieve from the search tool
-number_retrieved_pages=3
+number_retrieved_pages=5
 
 # Set the output file path
 output_path="instruction_tourist.json"
@@ -30,8 +30,8 @@ sample_size=10
 # Set the number of times to run the pipeline
 iterations_number=2
 
-# Set the name of the search tool to use (options: google_search_tool, serp_tool, serper_tool)
-tool_name="serper_tool"  # Options: google_search_tool, serp_tool, serper_tool
+# Set the name of the search tool to use (options: google_search, serp_tool, serper_tool)
+tool_name="serper_tool"  # Options: google_search, serp_tool, serper_tool
 
 # Run the main Python script with the specified arguments
 python main.py \
@@ -43,6 +43,7 @@ python main.py \
     --number_retrieved_pages "${number_retrieved_pages}" \
     --output_path "${output_path}" \
     --verbose true \
+    --seed_as_instructs true\
     --sample_size "${sample_size}" \
     --search_api_key "${search_api_key}" \
     --iterations "${iterations_number}" \

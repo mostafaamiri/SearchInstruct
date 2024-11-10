@@ -12,7 +12,7 @@ def get_examples(
     verbose: bool = False,
     seed_as_instructs: bool = False,
     sample_size: int = None
-):
+)-> dict:
     """
     Generate examples based on seed questions.
 
