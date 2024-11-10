@@ -1,24 +1,23 @@
 from .tools import Tools
 import requests
 from bs4 import BeautifulSoup
-from serpapi import GoogleSearch
 from typing import Tuple, List
 
-class SerpTool(Tools):
+class SerperTool(Tools):
     def __init__(self, name: str, api_key: str):
         """
-        Initializes the SerpTool with the given name and API key.
+        Initializes the SerperTool with the given name and API key.
 
         Parameters:
             name (str): The name of the tool.
-            api_key (str): The API key for SerpAPI.
+            api_key (str): The API key for Serper API.
         """
         super().__init__(name)
         self.api_key = api_key
 
     def get_context(self, query: str, num: int = 3, verbose: bool = False) -> Tuple[str, List[str]]:
         """
-        Retrieves context and links for a given query using SerpAPI.
+        Retrieves context and links for a given query using Serper API.
 
         Parameters:
             query (str): The search query.
@@ -28,20 +27,27 @@ class SerpTool(Tools):
         Returns:
             Tuple[str, List[str]]: A tuple containing the context string and a list of links.
         """
-        # Set up parameters for SerpAPI
-        params = {
-            "engine": "google",
-            "q": query,
-            "api_key": self.api_key,
-            "num": num
+        url = "https://google.serper.dev/search"
+        payload = {
+            "q": query
+        }
+        headers = {
+            'X-API-KEY': self.api_key,
+            'Content-Type': 'application/json'
         }
 
-        # Perform search using SerpAPI
-        search = GoogleSearch(params)
-        results = search.get_dict()
+        # Make a POST request to the Serper API
+        try:
+            response = requests.post(url, headers=headers, json=payload)
+            response.raise_for_status()
+            results = response.json()
+        except requests.RequestException as e:
+            if verbose:
+                print(f"Serper API request failed: {e}")
+            return "", []
 
-        # Extract organic results
-        organic_results = results.get("organic_results", [])
+        # Extract organic search results
+        organic_results = results.get("organic", [])
         links = [res.get('link') for res in organic_results[:num]]
 
         if verbose:
@@ -49,7 +55,7 @@ class SerpTool(Tools):
             for link in links:
                 print(link)
 
-        # Fetch content from the links
+        # Fetch content from the extracted links
         context = ""
         for link in links:
             try:
