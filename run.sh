@@ -33,6 +33,9 @@ iterations_number=2
 # Set the name of the search tool to use (options: google_search, serp_tool, serper_tool)
 tool_name="serper_tool"  # Options: google_search, serp_tool, serper_tool
 
+# Specify the maximum number of threads to use for parallel processing tasks.
+max_workers=8
+
 # Run the main Python script with the specified arguments
 python main.py \
     --llm_base_url "${llm_base_url}" \
@@ -47,4 +50,5 @@ python main.py \
     --sample_size "${sample_size}" \
     --search_api_key "${search_api_key}" \
     --iterations "${iterations_number}" \
+    --max_workers "${max_workers}" \
     --tool_name "${tool_name}"

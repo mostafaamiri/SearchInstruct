@@ -46,6 +46,12 @@ parser.add_argument(
     default=1,
     help="Number of times to run the pipeline."
 )
+parser.add_argument(
+    "--max_workers",
+    type=int,
+    default=4,
+    help="Maximum number of worker threads to use for processing questions."
+)
 
 args = parser.parse_args()
 
@@ -99,7 +105,8 @@ if __name__ == '__main__':
         verbose=args.verbose,
         seed_as_instructions=args.seed_as_instructs,
         sample_size=args.sample_size,
-        iterations=args.iterations  # Pass the iterations argument
+        iterations=args.iterations,
+        max_workers=args.max_workers  # Pass the max_workers argument
     )
 
     # Convert the instructions to a DataFrame
