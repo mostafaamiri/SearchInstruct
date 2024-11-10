@@ -2,6 +2,7 @@ from tools import SerpTool, LLM, GoogleSearchTool, SerperTool
 from argparse import ArgumentParser
 from pipeline import Pipeline
 import pandas as pd
+import os
 
 # Parse command-line arguments
 parser = ArgumentParser(description="Generate instructions using LLM and search tools.")
@@ -34,7 +35,7 @@ parser.add_argument(
     default=False,
     help="Use seed questions as instructions."
 )
-parser.add_argument("--output_path", required=True, help="Path to save the output JSON file.")
+parser.add_argument("--output_path", required=True, help="Path to save the output file.")
 parser.add_argument(
     "--sample_size",
     type=int,
@@ -95,9 +96,33 @@ if __name__ == '__main__':
         num_retrieved_pages=args.number_retrieved_pages
     )
 
-    # Read seed questions from the seed file
-    with open(args.seed_file, 'r') as file:
-        seed_questions = [line.strip() for line in file]
+    # Determine input and output file formats based on file extensions
+    input_extension = os.path.splitext(args.seed_file)[1].lower()
+    output_extension = os.path.splitext(args.output_path)[1].lower()
+
+    # Read seed questions from the seed file based on the file format
+    if input_extension in ['.txt']:
+        # Read seed questions from a text file
+        with open(args.seed_file, 'r', encoding='utf-8') as file:
+            seed_questions = [line.strip() for line in file if line.strip()]
+    elif input_extension in ['.json']:
+        # Read seed questions from a JSON file
+        df = pd.read_json(args.seed_file, orient='records')
+        seed_questions = df['question'].tolist()
+    elif input_extension in ['.jsonl']:
+        # Read seed questions from a JSON Lines file
+        df = pd.read_json(args.seed_file, orient='records', lines=True)
+        seed_questions = df['question'].tolist()
+    elif input_extension in ['.csv']:
+        # Read seed questions from a CSV file
+        df = pd.read_csv(args.seed_file)
+        seed_questions = df['question'].tolist()
+    elif input_extension in ['.xlsx']:
+        # Read seed questions from an Excel file
+        df = pd.read_excel(args.seed_file)
+        seed_questions = df['question'].tolist()
+    else:
+        raise ValueError(f"Unsupported seed file format: {input_extension}")
 
     # Run the pipeline to generate instructions
     instructions = pipeline(
@@ -106,16 +131,46 @@ if __name__ == '__main__':
         seed_as_instructions=args.seed_as_instructs,
         sample_size=args.sample_size,
         iterations=args.iterations,
-        max_workers=args.max_workers  # Pass the max_workers argument
+        max_workers=args.max_workers
     )
 
     # Convert the instructions to a DataFrame
     instructions_df = pd.DataFrame(instructions)
 
-    # Save the DataFrame as a JSON file
-    instructions_df.to_json(
-        args.output_path,
-        orient="records",
-        force_ascii=False,
-        indent=4
-    )
+    # Save the DataFrame to the output file based on the file format
+    if output_extension == '.json':
+        instructions_df.to_json(
+            args.output_path,
+            orient="records",
+            force_ascii=False,
+            indent=4
+        )
+    elif output_extension == '.jsonl':
+        instructions_df.to_json(
+            args.output_path,
+            orient="records",
+            force_ascii=False,
+            lines=True
+        )
+    elif output_extension == '.csv':
+        instructions_df.to_csv(
+            args.output_path,
+            index=False,
+            encoding='utf-8-sig'
+        )
+    elif output_extension == '.xlsx':
+        instructions_df.to_excel(
+            args.output_path,
+            index=False
+        )
+    elif output_extension == '.txt':
+        # Save as a text file with one instruction per line
+        with open(args.output_path, 'w', encoding='utf-8') as file:
+            for idx, row in instructions_df.iterrows():
+                file.write(f"Instruction {idx + 1}:\n")
+                file.write(f"Question: {row['instruction']}\n")
+                file.write(f"Answer: {row['output']}\n")
+                file.write(f"Sources: {row['links']}\n")
+                file.write("\n")
+    else:
+        raise ValueError(f"Unsupported output file format: {output_extension}")

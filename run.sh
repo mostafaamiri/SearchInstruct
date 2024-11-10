@@ -12,7 +12,7 @@ model_name="gpt-4o-mini"
 # Set the API key for the search tool
 search_api_key="764adea9b10a4d685b919bb33ee81ef0f457076a"
 
-# Set the path to the seed file containing sample questions
+# Set the path to the seed file containing sample questions (supports .txt, .json, .jsonl, .csv, .xlsx)seed_file="iran_tourism_seeds.txt"
 seed_file="iran_tourism_seeds.txt"
 
 # Set the number of new questions to create for each seed question
@@ -21,7 +21,7 @@ number_created_questions=3
 # Set the number of pages to retrieve from the search tool
 number_retrieved_pages=5
 
-# Set the output file path
+# Set the output file path (supports .txt, .json, .jsonl, .csv, .xlsx)
 output_path="instruction_tourist.json"
 
 # Set the number of seed questions to randomly select for LLM input
