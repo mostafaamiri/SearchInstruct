@@ -26,7 +26,7 @@ class SerpTool(Tools):
             verbose (bool): If True, prints additional information.
 
         Returns:
-            Tuple[str, List[str]]: A tuple containing the context string and a list of links.
+            Tuple[str, List[str]]: A tuple containing the context string and a list of used links.
         """
         # Set up parameters for SerpAPI
         params = {
@@ -42,16 +42,17 @@ class SerpTool(Tools):
 
         # Extract organic results
         organic_results = results.get("organic_results", [])
-        links = [res.get('link') for res in organic_results[:num]]
+        all_links = [res.get('link') for res in organic_results[:num]]
 
         if verbose:
             print("Retrieved links:")
-            for link in links:
+            for link in all_links:
                 print(link)
 
         # Fetch content from the links
         context = ""
-        for link in links:
+        used_links = []
+        for link in all_links:
             try:
                 resp = requests.get(link, timeout=30)
                 resp.raise_for_status()
@@ -60,8 +61,9 @@ class SerpTool(Tools):
                 if body:
                     context += body.get_text(separator=' ', strip=True)
                     context += "\n"
+                    used_links.append(link)  # Add link to used_links if content is successfully fetched
             except requests.RequestException as e:
                 if verbose:
                     print(f"Failed to fetch {link}: {e}")
 
-        return context, links
+        return context, used_links

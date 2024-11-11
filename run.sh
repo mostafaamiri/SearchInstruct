@@ -22,10 +22,10 @@ number_created_questions=3
 number_retrieved_pages=5
 
 # Set the output file path (supports .txt, .json, .jsonl, .csv, .xlsx)
-output_path="instruction_food_seeds.xlsx"
+output_path="instruction_food_seeds_test.xlsx"
 
 # Set the number of seed questions to randomly select for LLM input
-sample_size=500
+sample_size=8
 
 # Set the number of times to run the pipeline
 iterations_number=1
@@ -34,7 +34,7 @@ iterations_number=1
 tool_name="serper_tool"
 
 # Specify the maximum number of threads to use for parallel processing tasks.
-max_workers=16
+max_workers=8
 
 # Run the main Python script with the specified arguments
 python main.py \
