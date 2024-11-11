@@ -60,9 +60,11 @@ class Pipeline:
         # Add progress bar for iterations
         for iteration in tqdm(range(iterations), desc="Iterations", unit="iteration"):
             if verbose:
-                print(f"\nStarting iteration {iteration + 1} of {iterations}")
+                print(f"\033[34m\nStarting iteration {iteration + 1} of {iterations}\033[0m")
 
             # Generate sample questions based on the seed questions
+            if verbose:
+                print("\033[36mGenerating sample questions...\033[0m")
             samples = get_examples(
                 seed=seed_questions,
                 agent=self.llm,
@@ -74,7 +76,9 @@ class Pipeline:
             )
 
             if verbose:
-                print(f"Generated Samples: {samples}")
+                print("\033[32mGenerated Samples:\033[0m")
+                for idx, question in enumerate(samples['questions'], start=1):
+                    print(f"  {idx}. {question}")
 
             questions = samples['questions']
 
@@ -94,7 +98,7 @@ class Pipeline:
                         if instruction:
                             all_instructions.append(instruction)
                     except Exception as err:
-                        print(f"Error processing question '{question}': {err}")
+                        print(f"\033[31mError processing question '{question}': {err}\033[0m")
                     finally:
                         question_progress.update(1)
 
@@ -114,7 +118,12 @@ class Pipeline:
             dict: The instruction generated for the question.
         """
         try:
+            if verbose:
+                print(f"\033[35m\nProcessing question:\033[0m {question}")
+
             # Generate context and retrieve links using the search tool
+            if verbose:
+                print("\033[36mRetrieving context...\033[0m")
             context, links = make_context(
                 query=question,
                 tool=self.search_tool,
@@ -124,6 +133,9 @@ class Pipeline:
             # Truncate context if necessary
             max_context_length = 200000
             truncated_context = context[:min(max_context_length, len(context))]
+
+            if verbose:
+                print("\033[36mGenerating response...\033[0m")
             # Get the response using the LLM
             instruction = get_response(
                 query=question,
@@ -136,5 +148,5 @@ class Pipeline:
             )
             return instruction
         except Exception as err:
-            print(f"Unexpected error processing question '{question}': {err}, type: {type(err)}")
+            print(f"\033[31mUnexpected error processing question '{question}': {err}, type: {type(err)}\033[0m")
             return None

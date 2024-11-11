@@ -13,7 +13,7 @@ model_name="gpt-4o-mini"
 search_api_key="764adea9b10a4d685b919bb33ee81ef0f457076a"
 
 # Set the path to the seed file containing sample questions (supports .txt, .json, .jsonl, .csv, .xlsx)seed_file="iran_tourism_seeds.txt"
-seed_file="iran_tourism_seeds.txt"
+seed_file="food_seeds.txt"
 
 # Set the number of new questions to create for each seed question
 number_created_questions=3
@@ -22,19 +22,19 @@ number_created_questions=3
 number_retrieved_pages=5
 
 # Set the output file path (supports .txt, .json, .jsonl, .csv, .xlsx)
-output_path="instruction_tourist.json"
+output_path="instruction_food_seeds.xlsx"
 
 # Set the number of seed questions to randomly select for LLM input
-sample_size=10
+sample_size=500
 
 # Set the number of times to run the pipeline
-iterations_number=2
+iterations_number=1
 
 # Set the name of the search tool to use (options: google_search, serp_tool, serper_tool)
-tool_name="serper_tool"  # Options: google_search, serp_tool, serper_tool
+tool_name="serper_tool"
 
 # Specify the maximum number of threads to use for parallel processing tasks.
-max_workers=8
+max_workers=16
 
 # Run the main Python script with the specified arguments
 python main.py \

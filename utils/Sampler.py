@@ -12,7 +12,7 @@ def get_examples(
     verbose: bool = False,
     seed_as_instructs: bool = False,
     sample_size: int = None
-)-> dict:
+) -> dict:
     """
     Generate examples based on seed questions.
 
@@ -40,25 +40,26 @@ def get_examples(
     if sample_size is not None and sample_size < len(seed_questions):
         seed_questions = random.sample(seed_questions, sample_size)
         if verbose:
-            print(f"Randomly selected {sample_size} seed questions.")
+            print(f"\033[33mRandomly selected {sample_size} seed questions.\033[0m")
 
     # If verbose, print the seed questions
     if verbose:
-        print("Seed questions:")
+        print("\033[33mSeed questions:\033[0m")
         for idx, question in enumerate(seed_questions, start=1):
-            print(f"{idx} - {question}")
+            print(f"  {idx}. {question}")
 
     # If seed_as_instructs is True, return the seed questions as instructions
     if seed_as_instructs:
         result = {'questions': seed_questions}
         if verbose:
-            print("Using seed questions as instructions:")
-            for question in result['questions']:
-                print(question)
+            print("\033[33mUsing seed questions as instructions.\033[0m")
         return result
 
     # Prepare the questions string for the LLM prompt
     questions_text = "\n".join(f"{i+1} - {q}" for i, q in enumerate(seed_questions))
+
+    if verbose:
+        print("\033[36mSending request to LLM to generate new questions...\033[0m")
 
     # Generate new questions using the LLM
     completion = agent.get_client().chat.completions.create(
@@ -83,10 +84,10 @@ def get_examples(
             raise ValueError("No JSON content found in LLM response.")
         result = json.loads(json_content.group(0))
         if verbose:
-            print("Generated questions:")
-            for question in result.get('questions', []):
-                print(question)
+            print("\033[32mGenerated questions:\033[0m")
+            for idx, question in enumerate(result.get('questions', []), start=1):
+                print(f"  {idx}. {question}")
         return result
     except Exception as e:
-        print(f"Error parsing LLM output: {e}")
+        print(f"\033[31mError parsing LLM output: {e}\033[0m")
         return None
