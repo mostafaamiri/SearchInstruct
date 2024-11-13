@@ -8,7 +8,8 @@ class Pipeline:
     def __init__(
         self,
         llm_agent: LLM,
-        model_name: str,
+        model_sampler_name: str,
+        model_responder_name: str,
         sample_prompt: str,
         respond_prompt: str,
         search_tool: Tools,
@@ -19,14 +20,16 @@ class Pipeline:
 
         Parameters:
             llm_agent (LLM): The language model agent to use for generating and responding.
-            model_name (str): The name of the model to use.
+            model_sampler_name (str): The name of the model to use sampling.
+            model_responder_name (str): The name of the model to use responding.
             sample_prompt (str): The prompt used to generate sample questions.
             respond_prompt (str): The prompt used for generating responses to questions.
             search_tool (Tools): The search tool to use for retrieving context.
             num_retrieved_pages (int): The number of pages to retrieve for context.
         """
         self.llm = llm_agent
-        self.model_name = model_name
+        self.model_sampler_name = model_sampler_name
+        self.model_responder_name = model_responder_name
         self.sample_prompt = sample_prompt
         self.respond_prompt = respond_prompt
         self.search_tool = search_tool
@@ -72,7 +75,7 @@ class Pipeline:
             samples = get_examples(
                 seed=seed_questions,
                 agent=self.llm,
-                model=self.model_name,
+                model=self.model_sampler_name,
                 prompt=self.sample_prompt,
                 verbose=verbose,
                 seed_as_instructs=seed_as_instructions,
@@ -168,7 +171,7 @@ class Pipeline:
                 context=truncated_context,
                 links=links,
                 agent=self.llm,
-                model=self.model_name,
+                model=self.model_responder_name,
                 prompt=self.respond_prompt,
                 verbose=verbose
             )

@@ -8,7 +8,8 @@ import os
 parser = ArgumentParser(description="Generate instructions using LLM and search tools.")
 parser.add_argument("--llm_base_url", required=True, help="Base URL for the LLM API.")
 parser.add_argument("--llm_api_key", required=True, help="API key for the LLM.")
-parser.add_argument("--model_name", required=True, help="Name of the LLM model to use.")
+parser.add_argument("--model_sampler", required=True, help="Name of the model to use for question sampling.")
+parser.add_argument("--model_responder", required=True, help="Name of the model to use for responding to questions.")
 parser.add_argument(
     "--tool_name",
     choices=['serp_tool', 'serper_tool', 'google_search'],
@@ -111,13 +112,13 @@ if __name__ == '__main__':
     # Initialize the pipeline with the LLM, model name, prompts, search tool, and number of pages to retrieve
     pipeline = Pipeline(
         llm_agent=llm,
-        model_name=args.model_name,
+        model_sampler_name=args.model_sampler,
+        model_responder_name=args.model_responder,
         sample_prompt=sample_prompt,
         respond_prompt=respond_prompt,
         search_tool=search_tool,
         num_retrieved_pages=args.number_retrieved_pages
     )
-
     # Determine input and output file formats based on file extensions
     input_extension = os.path.splitext(args.seed_file)[1].lower()
     output_extension = os.path.splitext(args.output_path)[1].lower()
