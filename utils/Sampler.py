@@ -73,8 +73,8 @@ def get_examples(
                 "content": questions_text,
             }
         ],
-        temperature=0.5,
-        model=model,
+        temperature=0.2,
+        model='gpt-4o',
     )
 
     # Extract JSON from the LLM's response

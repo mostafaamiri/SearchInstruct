@@ -10,31 +10,32 @@ llm_api_key="sk-proj-mR8fh4IOpTxJrdE8ZHmgm6RHeqSW2KZEw1sXWBu7LSrEtQX4zVqc3VzHOU1
 model_name="gpt-4o-mini"
 
 # Set the API key for the search tool
-search_api_key="764adea9b10a4d685b919bb33ee81ef0f457076a"
+search_api_key="aa0e2effab7aee92a1026a90bd7b3df08c29c934"
 
 # Set the path to the seed file containing sample questions (supports .txt, .json, .jsonl, .csv, .xlsx)seed_file="iran_tourism_seeds.txt"
 seed_file="food_seeds.txt"
 
 # Set the number of new questions to create for each seed question
-number_created_questions=3
+number_created_questions=4
 
 # Set the number of pages to retrieve from the search tool
 number_retrieved_pages=5
 
 # Set the output file path (supports .txt, .json, .jsonl, .csv, .xlsx)
-output_path="instruction_food_seeds_test.xlsx"
+output_path="/home/barati/search_instruct/created_data/instruction_food_search_instruct_5.xlsx"
 
 # Set the number of seed questions to randomly select for LLM input
-sample_size=8
+sample_size=20
 
 # Set the number of times to run the pipeline
-iterations_number=1
+iterations_number=100
 
 # Set the name of the search tool to use (options: google_search, serp_tool, serper_tool)
 tool_name="serper_tool"
 
-# Specify the maximum number of threads to use for parallel processing tasks.
-max_workers=8
+max_workers_questions=16
+
+max_workers_iterations=16
 
 # Run the main Python script with the specified arguments
 python main.py \
@@ -46,9 +47,9 @@ python main.py \
     --number_retrieved_pages "${number_retrieved_pages}" \
     --output_path "${output_path}" \
     --verbose true \
-    --seed_as_instructs true\
     --sample_size "${sample_size}" \
     --search_api_key "${search_api_key}" \
     --iterations "${iterations_number}" \
-    --max_workers "${max_workers}" \
+    --max_workers_questions "${max_workers_questions}" \
+    --max_workers_iterations "${max_workers_iterations}" \
     --tool_name "${tool_name}"

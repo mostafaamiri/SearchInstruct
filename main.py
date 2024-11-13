@@ -48,10 +48,16 @@ parser.add_argument(
     help="Number of times to run the pipeline."
 )
 parser.add_argument(
-    "--max_workers",
+    "--max_workers_questions",
     type=int,
     default=4,
     help="Maximum number of worker threads to use for processing questions."
+)
+parser.add_argument(
+    "--max_workers_iterations",
+    type=int,
+    default=4,
+    help="Maximum number of worker threads for iterations."
 )
 
 args = parser.parse_args()
@@ -71,12 +77,28 @@ else:
 
 # Define the sample prompt for question generation
 sample_prompt = f"""
-You are a question generation expert.
-You will be given a sample question.
-Your task is to generate {args.number_created_questions} new questions similar to the sample question by changing specific details such as names, numbers, and expression types while maintaining the overall context and structure.
-Return the output in JSON format with a key named 'questions', where the value is an array of the generated questions.
-Do not include any additional explanations or comments in your response.
+You are an expert in question generation.
+You will be provided with a sample question.
+Your task is to create exactly **{args.number_created_questions}** new questions inspired by the sample questions. 
+Each question should retain the structure and intent of the original sample questions but include variations by modifying specific details.
+
+The generated questions must:
+1. Be realistic, logical, and coherent.
+2. Showcase creativity while maintaining a challenging nature.
+3. Avoid being overly simple, nonsensical, or repetitive.
+
+Provide the output in JSON format with the following structure:
+{{
+    "questions": [
+        "Generated question 1",
+        "Generated question 2",
+        ...
+    ]
+}}
+
+Do not include any additional explanations, comments, or extra content. Only return the JSON output as specified.
 """
+
 
 # Define the respond prompt for answering questions
 respond_prompt = """
@@ -131,7 +153,8 @@ if __name__ == '__main__':
         seed_as_instructions=args.seed_as_instructs,
         sample_size=args.sample_size,
         iterations=args.iterations,
-        max_workers=args.max_workers
+        max_workers_iterations=args.max_workers_iterations,
+        max_workers_questions=args.max_workers_questions
     )
 
     # Convert the instructions to a DataFrame
