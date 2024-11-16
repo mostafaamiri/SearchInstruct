@@ -90,4 +90,4 @@ def get_examples(
         return result
     except Exception as e:
         print(f"\033[31mError parsing LLM output: {e}\033[0m")
-        return None
+        return {'questions': []}

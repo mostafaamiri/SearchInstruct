@@ -13,19 +13,23 @@ class Pipeline:
         sample_prompt: str,
         respond_prompt: str,
         search_tool: Tools,
-        num_retrieved_pages: int
+        number_retrieved_pages: int,
+        skip_websites: List[str],
+        used_number_of_links: int
     ):
         """
         Initializes the Pipeline with the necessary components.
 
         Parameters:
             llm_agent (LLM): The language model agent to use for generating and responding.
-            model_sampler_name (str): The name of the model to use sampling.
-            model_responder_name (str): The name of the model to use responding.
+            model_sampler_name (str): The name of the model to use for sampling.
+            model_responder_name (str): The name of the model to use for responding.
             sample_prompt (str): The prompt used to generate sample questions.
             respond_prompt (str): The prompt used for generating responses to questions.
             search_tool (Tools): The search tool to use for retrieving context.
-            num_retrieved_pages (int): The number of pages to retrieve for context.
+            number_retrieved_pages (int): The number of pages to retrieve from the search tool.
+            skip_websites (List[str]): List of website domains to skip during content retrieval.
+            used_number_of_links (int): Desired number of successfully fetched links.
         """
         self.llm = llm_agent
         self.model_sampler_name = model_sampler_name
@@ -33,7 +37,9 @@ class Pipeline:
         self.sample_prompt = sample_prompt
         self.respond_prompt = respond_prompt
         self.search_tool = search_tool
-        self.num_retrieved_pages = num_retrieved_pages
+        self.number_retrieved_pages = number_retrieved_pages
+        self.skip_websites = skip_websites
+        self.used_number_of_links = used_number_of_links
 
     def __call__(
         self,
@@ -156,8 +162,10 @@ class Pipeline:
             context, links = make_context(
                 query=question,
                 tool=self.search_tool,
-                num=self.num_retrieved_pages,
-                verbose=verbose
+                num_pages=self.number_retrieved_pages,
+                verbose=verbose,
+                skip_websites=self.skip_websites,
+                used_number_of_links=self.used_number_of_links
             )
             # Truncate context if necessary
             max_context_length = 200000
@@ -165,7 +173,7 @@ class Pipeline:
 
             if verbose:
                 print("\033[36mGenerating response...\033[0m")
-            # Get the response using the LLM
+            # Get the response using the responder model
             instruction = get_response(
                 query=question,
                 context=truncated_context,
@@ -177,5 +185,5 @@ class Pipeline:
             )
             return instruction
         except Exception as err:
-            print(f"\033[31mUnexpected error processing question '{question}': {err}, type: {type(err)}\033[0m")
+            print(f"\033[31mUnexpected error processing question '{question}': {err}\033[0m")
             return None
