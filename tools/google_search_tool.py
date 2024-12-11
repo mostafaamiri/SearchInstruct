@@ -5,6 +5,7 @@ from googlesearch import search
 from .llm import LLM
 from time import sleep
 from typing import List, Tuple, Optional
+from urllib.parse import urlparse
 
 class GoogleSearchTool(Tools):
     def __init__(
@@ -28,81 +29,96 @@ class GoogleSearchTool(Tools):
     def get_context(
         self,
         query: str,
-        num: int = 3,
-        verbose: bool = False
+        num_pages: int = 1,
+        verbose: bool = False,
+        skip_websites: Optional[List[str]] = None,
+        used_number_of_links: Optional[int] = None
     ) -> Tuple[str, List[str]]:
         """
         Retrieves context and links for the given query using Google search.
 
         Parameters:
             query (str): The search query.
-            num (int): The number of links to retrieve content from.
+            num_pages (int): Not used in this implementation as pagination is not supported.
             verbose (bool): If True, prints additional debug information.
+            skip_websites (List[str], optional): List of website domains to skip.
+            used_number_of_links (int, optional): Desired number of successfully fetched links.
 
         Returns:
             Tuple[str, List[str]]: A tuple containing the concatenated context string and a list of used links.
         """
-        retrieval_links = []
+        if skip_websites is None:
+            skip_websites = []
+        if used_number_of_links is None:
+            used_number_of_links = 3  # Default desired number of used links
+
         max_attempts = 3
         attempts = 0
+        results_per_page = 10  # Max number of results per search query
+        context = ""
+        used_links = []
 
         # Prepare the query, potentially using the LLM agent
         prepared_query = self.prepare_query(query)
 
-        # Loop to retry the search if no results are found
         while attempts < max_attempts:
             attempts += 1
-            idx = 0
             try:
                 # Perform Google search
                 results = search(
                     prepared_query,
-                    num_results=20,
+                    num_results=used_number_of_links * 2,  # Fetch more results to account for skips/failures
                     advanced=True,
                     lang="fa"
                 )
-                # Collect URLs from the search results
-                for idx, result in enumerate(results, start=1):
-                    retrieval_links.append(result.url)
-                    if verbose:
-                        print(f"{idx}: {result.url}")
                 if verbose:
-                    print("\033[93mEnd of search\033[0m")
-                # If results are found, break the loop
-                if idx > 0:
+                    print(f"Retrieved links:")
+
+                # Process links
+                for idx, result in enumerate(results):
+                    if len(used_links) >= used_number_of_links:
+                        break
+
+                    link = result.url
+                    if verbose:
+                        print(f"{idx + 1}: {link}")
+
+                    # Skip links from skipped websites
+                    parsed_url = urlparse(link)
+                    domain = parsed_url.netloc
+
+                    if any(skip_domain in domain for skip_domain in skip_websites):
+                        if verbose:
+                            print(f"Skipping link from skipped website: {link}")
+                        continue
+
+                    try:
+                        resp = requests.get(link, timeout=30)
+                        resp.raise_for_status()
+                        bs = BeautifulSoup(resp.text, 'html.parser')
+                        body = bs.find('body')
+                        if body:
+                            context += body.get_text(separator=' ', strip=True)
+                            context += "\n"
+                            used_links.append(link)
+                    except requests.RequestException as e:
+                        if verbose:
+                            print(f"\033[94mCan't open {link}: {e}\033[0m")
+                        continue
+
+                # If we've reached the desired number of used links, exit the loop
+                if len(used_links) >= used_number_of_links:
                     break
+
+                if len(used_links) < used_number_of_links:
+                    if verbose:
+                        print(f"Could only retrieve {len(used_links)} out of {used_number_of_links} desired links.")
+                    break  # No more results to process
+
             except Exception as e:
                 if verbose:
                     print(f"Error during search: {e}")
                 sleep(5)  # Wait before retrying
-
-        if idx == 0:
-            if verbose:
-                print("No search results found after multiple attempts.")
-            return "", []
-
-        context = ""
-        used_links = []
-        num_context = 0
-
-        # Fetch content from the retrieved links
-        for link in retrieval_links:
-            if num_context >= num:
-                break
-            try:
-                resp = requests.get(link, timeout=30)
-                resp.raise_for_status()
-                bs = BeautifulSoup(resp.text, 'html.parser')
-                body = bs.find('body')
-                if body:
-                    context += body.get_text(separator=' ', strip=True)
-                    context += "\n"
-                    used_links.append(link)
-                    num_context += 1
-            except requests.RequestException as e:
-                if verbose:
-                    print(f"\033[94mCan't open {link}: {e}\033[0m")
-                continue
 
         return context, used_links
 
@@ -131,7 +147,7 @@ class GoogleSearchTool(Tools):
                     ],
                     model=self.model,
                 )
-                result = completion.choices[0].message.content
+                result = completion.choices[0].message.content.strip()
                 return result
             except Exception as e:
                 if hasattr(self, 'verbose') and self.verbose:
